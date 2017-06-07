@@ -4,6 +4,18 @@
 import boto3
 import os
 import datetime
+from datetime import timedelta, tzinfo
+
+
+class JST(tzinfo):
+    def utcoffset(self, dt):
+        return timedelta(hours=9)
+
+    def dst(self, dt):
+        return timedelta(0)
+
+    def tzname(self, dt):
+        return 'JST'
 
 
 class EbsKeeper():
@@ -39,7 +51,7 @@ class EbsKeeper():
         return snapshot_id
 
     def __build_description(self):
-        time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+        time = datetime.datetime.now(tz=JST()).strftime("%Y/%m/%d %H:%M:%S%z")
         return 'Created by EBS Keeper from %s at %s' % (self.volume_id, time)
 
     def __fetch_name_tag(self):

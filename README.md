@@ -6,6 +6,13 @@
 https://s3-ap-northeast-1.amazonaws.com/ebskeeper/ebskeeper.zip
 ```
 
+- Environment variable must be specified, `VOLUME_ID` and `LIFECYCLE` .
+
+```
+VOLUME_ID=vol-xxxxxxxxxxxxx
+LIFECYCLE=3
+```
+
 - Required permission.
 
 ```

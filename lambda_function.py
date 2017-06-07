@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # _*_ coding: utf-8 _*_
 
-import logging
 import boto3
 import os
 import datetime
@@ -12,9 +11,6 @@ class EbsKeeper():
         self.volume_id = os.environ["VOLUME_ID"]
         self.lifecycle = int(os.environ["LIFECYCLE"])
         self.client = boto3.client('ec2')
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(logging.StreamHandler())
 
     def create_snapshot(self):
         description = self.__build_description()
@@ -22,7 +18,7 @@ class EbsKeeper():
         name_tag = list(self.__fetch_name_tag())
         if len(name_tag) != 0:
             self.__create_tag(name_tag[0])
-        self.logger.info('Create snapshot: ' + self.snapshot_id)
+        print('Create snapshot: ' + self.snapshot_id)
 
     def rotate_snapshots(self):
         while True:
@@ -30,7 +26,7 @@ class EbsKeeper():
             if len(snapshots) > self.lifecycle:
                 snapshot_id = snapshots[0]['SnapshotId']
                 self.__delete_snapshot(snapshot_id)
-                self.logger.info('Delete snapshot: ' + snapshot_id)
+                print('Delete snapshot: ' + snapshot_id)
             else:
                 break
 

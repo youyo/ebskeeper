@@ -23,6 +23,7 @@ class EbsKeeper():
         self.volume_id = os.environ["VOLUME_ID"]
         self.lifecycle = int(os.environ["LIFECYCLE"])
         self.client = boto3.client('ec2')
+        self.base_description = 'Created by EBS Keeper from %s' % self.volume_id
 
     def create_snapshot(self):
         description = self.__build_description()
@@ -52,7 +53,7 @@ class EbsKeeper():
 
     def __build_description(self):
         time = datetime.datetime.now(tz=JST()).strftime("%Y/%m/%d %H:%M:%S%z")
-        return 'Created by EBS Keeper from %s at %s' % (self.volume_id, time)
+        return self.base_description + ' at %s' % time
 
     def __fetch_name_tag(self):
         tags = self.client.describe_tags(
@@ -75,10 +76,16 @@ class EbsKeeper():
 
     def __describe_snapshots(self):
         snapshots = self.client.describe_snapshots(
-            Filters=[{
-                'Name': 'volume-id',
-                'Values': [self.volume_id]
-            }]
+            Filters=[
+                {
+                    'Name': 'volume-id',
+                    'Values': [self.volume_id]
+                },
+                {
+                    'Name': 'description',
+                    'Values': [self.base_description + '*']
+                }
+            ]
         )
         sorted_data = sorted(snapshots['Snapshots'], key=lambda x: x['StartTime'])
         return sorted_data
